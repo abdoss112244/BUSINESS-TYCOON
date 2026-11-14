@@ -1,0 +1,39 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: تحميل المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: إعداد Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: تثبيت أدوات Android
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: فك ضغط المشروع
+        run: unzip BUSINESS_TYCOON_ANDROID_SOURCE.zip
+
+      - name: بناء APK
+        run: |
+          cd BUSINESS_TYCOON_ANDROID
+          gradle assembleDebug
+
+      - name: حفظ APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BUSINESS-TYCOON-APK
+          path: BUSINESS_TYCOON_ANDROID/app/build/outputs/apk/debug/app-debug.apk
